@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Добавить новую приемку для проекта {{ project.name }}</h2>
+<form method="POST">
+    <div class="form-group">
+        <label for="priemka_date">Дата приемки:</label>
+        <input type="date" class="form-control" id="priemka_date" name="priemka_date" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Добавить приемку</button>
+</form>
+<a href="{{ url_for('project_details', project_id=project.id) }}" class="btn btn-secondary mt-3">Назад к проекту</a>
+{% endblock %}

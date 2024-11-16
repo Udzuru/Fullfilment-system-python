@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Действия</title>
+</head>
+<body>
+    <h1>Действия</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Проект</th>
+                <th>Действие</th>
+                <th>Количество</th>
+                <th>Взятые</th>
+                <th>Статус</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reception in receptions %}
+            <tr>
+                <td>{{ reception.action.project.name }}</td>
+                <td>{{ reception.action.name }}</td>
+                <td>{{ reception.action.project.total_quantity }}</td>
+                <td>{{ reception.taken_quantity }} из {{ reception.action.project.total_quantity }}</td>
+                <td>{{ reception.status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

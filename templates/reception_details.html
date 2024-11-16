@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Детали приемки</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Детали приемки #{{ reception.id }}</h1>
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title">Информация о приемке</h5>
+                <p class="card-text"><strong>Дата приемки:</strong> {{ reception.priemka_date.strftime('%d.%m.%Y') }}</p>
+                {% if project %}
+                    <p class="card-text"><strong>Проект:</strong> {{ project.name }}</p>
+                {% else %}
+                    <p class="card-text"><strong>Проект:</strong> Не назначен</p>
+                {% endif %}
+            </div>
+        </div>
+        <a href="{{ url_for('index') }}" class="btn btn-primary mt-3">Вернуться на главную</a>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

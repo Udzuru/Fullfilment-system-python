@@ -1,0 +1,48 @@
+-- Создание таблицы для Ip
+CREATE TABLE ip (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL
+);
+
+-- Создание таблицы для Projects
+CREATE TABLE projects (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    create_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    quantity INTEGER
+);
+
+-- Создание таблицы для Employees
+CREATE TABLE employees (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    role TEXT NOT NULL
+);
+
+-- Создание таблицы для Goods
+CREATE TABLE goods (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ip_id INTEGER,
+    name TEXT NOT NULL,
+    barcode TEXT NOT NULL,
+    article TEXT NOT NULL,
+    wb_article TEXT NOT NULL,
+    create_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    edit_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    country TEXT NOT NULL,
+    compound TEXT NOT NULL,
+    color TEXT NOT NULL,
+    FOREIGN KEY (ip_id) REFERENCES ip(id) ON DELETE SET NULL
+);
+
+-- Создание таблицы для Receptions
+CREATE TABLE receptions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    project_id INTEGER NOT NULL,
+    employee_id INTEGER NOT NULL,
+    goods_quantity INTEGER NOT NULL,
+    reception_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE,
+    FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
+);

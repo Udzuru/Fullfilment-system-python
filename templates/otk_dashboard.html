@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ОТК Dashboard</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Панель ОТК</h2>
+        
+        <h3>Текущие задачи в работе</h3>
+        <form action="{{ url_for('complete_task') }}" method="POST">
+            {% if current_receptions %}
+                {% for reception_date, tasks in current_receptions.items() %}
+                    <h4>Приемка от {{ reception_date }}</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Проект</th>
+                                <th>Действие</th>
+                                <th>Количество</th>
+                                <th>Статус</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in tasks %}
+                            <tr>
+                                <td>{{ task.project.name }}</td>
+                                <td>{{ task.action.name }}</td>
+                                <td>{{ task.user_action.kol_vo }}</td>
+                                <td>{{ task.user_action.status }}</td>
+                                <td>
+                                    <input type="hidden" name="task_ids[]" value="{{ task.user_action.id }}">
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('report_defect', reception_id=task.reception.id) }}" class="btn btn-warning">Сообщить о браке</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endfor %}
+                <button type="submit" class="btn btn-success">Завершить работу</button>
+                
+            {% else %}
+                <p>Нет текущих задач в работе.</p>
+            {% endif %}
+        </form>
+
+
+        <h3>Доступные проекты</h3>
+        <div class="list-group">
+            {% for project in projects %}
+            <a href="{{ url_for('otk_project_details', project_id=project.id) }}" 
+               class="list-group-item list-group-item-action">
+                {{ project.name }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

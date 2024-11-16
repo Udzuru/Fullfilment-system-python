@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Сообщить о браке</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Сообщить о браке для приемки от {{ reception.priemka_date.strftime('%d.%m.%Y') }}</h2>
+        <form method="POST">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Товар</th>
+                        <th>Количество брака</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.name }}</td>
+                        <td>
+                            <input type="number" name="defect_quantity_{{ product.id }}" min="0" value="0" class="form-control">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-success">Сообщить о браке</button>
+        </form>
+    </div>
+</body>
+</html>

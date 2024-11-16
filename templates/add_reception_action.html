@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Добавить действие</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .action-group {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        
+        .action-item {
+            margin-bottom: 10px;
+        }
+        
+        .custom-action {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .form-check-input {
+            margin-top: 0.3rem;
+        }
+        
+        .action-description {
+            margin-left: 25px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Добавить действие для приемки</h2>
+        
+        <form method="POST">
+            <div class="action-group">
+                <h4>Стандартные действия</h4>
+                
+                <div class="action-item">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="action1" name="actions" value="Прием на склад и перерасчет" checked>
+                        <label class="form-check-label" for="action1">Прием на склад и перерасчет</label>
+                    </div>
+                </div>
+
+                <div class="action-item">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="action2" name="actions" value="Проверка на брак" checked>
+                        <label class="form-check-label" for="action2">Проверка на брак</label>
+                        <div class="action-description">Проверяем товар на наличие брака, чистим изделие от ниток, убираем следы от мела</div>
+                    </div>
+                </div>
+
+                <div class="action-item">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="action3" name="actions" value="Проверка размерности" checked>
+                        <label class="form-check-label" for="action3">Проверка размерности</label>
+                    </div>
+                </div>
+
+                <div class="action-item">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="action4" name="actions" value="Упаковка в пакет" checked>
+                        <label class="form-check-label" for="action4">Упаковка в пакет</label>
+                    </div>
+                </div>
+
+                <div class="action-item">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="action5" name="actions" value="Сортировка" checked>
+                        <label class="form-check-label" for="action5">Собрать, скомпоновать и рассортировать по цветам и размерам</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="action-group">
+                <h4>Дополнительные действия</h4>
+
+                <div class="action-item">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="action6" name="actions" value="Прием на склад и перер асчет (Товары без индивидуальной упаковки)">
+                        <label class="form-check-label" for="action6">Прием на склад и перерасчет (Товары без индивидуальной упаковки)</label>
+                    </div>
+                </div>
+
+                <div class="action-item">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="action7" name="actions" value="Маркировка товара 2 штуки">
+                        <label class="form-check-label" for="action7">Маркировка товара 2 штуки</label>
+                        <div class="action-description">Наклеиваем на бирку и упаковку</div>
+                    </div>
+                </div>
+
+                <div class="action-item">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="action8" name="actions" value="Маркирование товара 'Честный знак' 2 штуки">
+                        <label class="form-check-label" for="action8">Маркирование товара "Честный знак" 2 штуки</label>
+                        <div class="action-description">Наклеиваем на бирку и упаковку</div>
+                    </div>
+                </div>
+
+                <div class="action-item">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="action9" name="actions" value="Биркование товара">
+                        <label class="form-check-label" for="action9">Биркование товара</label>
+                    </div>
+                </div>
+
+                <div class="action-item">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="action10" name="actions" value="Срезать лейбл/составник">
+                        <label class="form-check-label" for="action10">Срезать лейбл/составник</label>
+                    </div>
+                </div>
+
+                <div class="action-item">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="action11" name="actions" value="Пустая картонная бирка">
+                        <label class="form-check-label" for="action11">Пустая картонная бирка</label>
+                    </div>
+                </div>
+
+                <div class="action-item">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="action12" name="actions" value="Формирование короба поставки">
+                        <label class="form-check-label" for="action12">Формирование короба поставки</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="custom-action">
+                <h4>Добавить свое действие</h4>
+                <input type="text" name="custom_action" class="form-control" placeholder="Введите свое действие">
+            </div>
+
+            <button type="submit" class="btn btn-primary">Добавить</button>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

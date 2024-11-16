@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои действия</title>
+</head>
+<body>
+    <h1>Мои действия</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Проект</th>
+                <th>Действие</th>
+                <th>Количество</th>
+                <th>Взять в работу</th>
+                <th>Статус</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reception in receptions %}
+            <tr>
+                <td>{{ reception.action.project.name }}</td>
+                <td>{{ reception.action.name }}</td>
+                <td>{{ reception.action.project.total_quantity }}</td>
+                <td>
+                    <form action="{{ url_for('take_reception', reception_id=reception.id) }}" method="post">
+                        <input type="number" name="taken_quantity" required>
+                        <button type="submit">Взять в работу</button>
+                    </form>
+                </td>
+                <td>{{ reception.status }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <h1>Доступные действия</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Проект</th>
+                <th>Действие</th>
+                <th>Количество</th>
+                <th>Взять в работу</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for action in actions %}
+            <tr>
+                <td>{{ action.project.name }}</td>
+                <td>{{ action.name }}</td>
+                <td>{{ action.project.total_quantity }}</td>
+                <td>
+                    <form action="{{ url_for('take_action', action_id=action.id) }}" method="post">
+                        <input type="number" name="taken_quantity" required>
+                        <button type="submit">Взять в работу</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

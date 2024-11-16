@@ -1,0 +1,63 @@
+<!-- edit_employees.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактировать сотрудника</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Admin Dashboard</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('list_projects') }}">Проекты</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('list_ips') }}">ИП - шники</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('list_goods') }}">Товары</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('list_employees') }}">Сотрудники</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1>Редактировать сотрудника</h1>
+        
+        <form method="POST" action="{{ url_for('edit_employee', employee_id=employee.id) }}">
+            <div class="form-group">
+                <label for="fio">ФИО</label>
+                <input type="text" class="form-control" id="fio" name="fio" value="{{ employee.fio }}" required>
+            </div>
+            <div class="form-group">
+                <label for="login">Логин</label>
+                <input type="text" class="form-control" id="login" name="login" value="{{ employee.login }}" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="Введите новый пароль">
+                <small class="form-text text-muted">Оставьте пустым, если не хотите менять пароль</small>
+            </div>
+            <div class="form-group">
+                <label for="role">Роль</label>
+                <select class="form-control" id="role" name="role" required>
+                    <option value="Администратор" {% if employee.role == 'Администратор' %}selected{% endif %}>Администратор</option>
+                    <option value="ОТК" {% if employee.role == 'ОТК' %}selected{% endif %}>ОТК</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            <a href="{{ url_for('list_employees') }}" class="btn btn-secondary">Отмена</a>
+        </form>
+    </div>
+</body>
+</html>

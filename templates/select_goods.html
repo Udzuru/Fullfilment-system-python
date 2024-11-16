@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block content %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<h2>Выберите товар для проекта {{ project.name }}</h2>
+
+<form id="search_goods_form">
+    <input type="text" id="search_goods_input" placeholder="Введите запрос для поиска...">
+    <button type="submit">Искать</button>
+</form>
+
+<table id="goods_table" class="table">
+    <thead>
+        <tr>
+            <th>Выбрать</th>
+            <th>Название</th>
+            <th>Цвет</th>
+            <th>Размер</th>
+            <th>Штрих-код</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for goods in all_goods %}
+        <tr>
+            <td>
+                <input type="checkbox" class="goods-checkbox" value="{{ goods.id }}">
+            </td>
+            <td>{{ goods.name }}</td>
+            <td>{{ goods.color }}</td>
+            <td>{{ goods.size }}</td>
+            <td>{{ goods.barcode }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<button id="add_selected_goods" class="btn btn-primary">Добавить выбранные товары</button>
+<a href="{{ url_for('add_new_goods', project_id=project.id) }}" class="btn btn-success">Добавить новый товар</a>
+
+<script>
+    $(document).ready(function() {
+        $('#search_goods_form').on('submit', function(e) {
+            e.preventDefault();
+            $.ajax({
+                type: 'GET',
+                url: '{{ url_for("search_goods") }}',
+                data: {query: $('#search_goods_input').val()},
+                success: function(data) {
+                    $('#goods_table tbody').empty();
+                    $.each(data, function(index, goods) {
+                        var row = '<tr>' +
+                            '<td><input type="checkbox" class="goods-checkbox" value="' + goods.id + '"></td>' +
+                            '<td>' + goods.name + '</td>' +
+                            '<td>' + goods.color + '</td>' +
+                            '<td>' + goods.size + '</td>' +
+                            '<td>' + goods.barcode + '</td>' +
+                            '</tr>';
+                        $('#goods_table tbody').append(row);
+                    });
+                }
+            });
+        });
+
+        $('#add_selected_goods').on('click', function() {
+    var selectedGoods = [];
+    $('.goods-checkbox:checked').each(function() {
+        selectedGoods.push($(this).val());
+    });
+    alert(selectedGoods);
+    if (selectedGoods.length > 0) {
+        $.ajax({
+            type: 'POST',
+            url: '{{ url_for("add_goods_to_project", project_id=project.id) }}',
+            data: {goods_ids: JSON.stringify(selectedGoods)},
+            success: function(response) {
+                
+                if (response.success) {
+                    // Переход на страницу с деталями проекта
+                    window.location.href = '{{ url_for("project_details", project_id=project.id) }}';
+                } else {
+                    alert('Ошибка: ' + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Ошибка при добавлении товаров:", error);
+                alert('Произошла ошибка при добавлении товаров.');
+            }
+        });
+    } else {
+        alert('Пожалуйста, выберите хотя бы один товар.');
+    }
+});
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Детали проекта {{ project.name }}</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h2>Детали проекта {{ project.name }}</h2>
+        
+        <!-- Список приемок -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4>Приемки</h4>
+            </div>
+            <div class="card-body">
+                {% if receptions %}
+                    <form action="{{ url_for('take_tasks') }}" method="POST">
+                        {% for reception in receptions %}
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5>Приемка от {{ reception.priemka_date.strftime('%d.%m.%Y') }}</h5>
+                                <p>Общее количество товаров: {{ reception.total_quantity }}</p>
+                            </div>
+                            <div class="card-body">
+                                <h6>Доступные действия:</h6>
+                                {% if reception.actions %}
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>Действие</th>
+                                                <th>Доступное количество</th>
+                                                <th>Взять в работу</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for action in reception.actions %}
+                                            <tr>
+                                                <td>{{ action.name }}</td>
+                                                <td>{{ action.available_quantity }}</td>
+                                                <td>
+                                                    {% if action.available_quantity > 0 and not action.in_progress %}
+                                                    <input type="checkbox" name="actions[]" value="{{ action.id }}">
+                                                    {% else %}
+                                                    <span class="text-muted">Недоступно</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    <div class="form-group">
+                                        <label for="total_quantity_{{ reception.id }}">Общее количество товаров</label>
+                                        <input type="number" id="total_quantity_{{ reception.id }}" name="total_quantity_{{ reception.id }}" placeholder="Количество товаров" min="1" max="{{ reception.total_quantity }}" class="form-control">
+                                    </div>
+                                {% else %}
+                                    <p>Нет доступных действий</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-primary">Взять выбранные задачи</button>
+                    </form>
+                {% else %}
+                    <p>Нет приемок</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

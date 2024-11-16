@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Детали проекта</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .editable:hover {
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+        input[type="number"] {
+    width: 60px;
+}
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Admin Dashboard</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('list_projects') }}">Проекты</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('list_ips') }}">ИП - шники</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('list_goods') }}">Товары</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('list_employees') }}">Сотрудники</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <h1>
+            <span id="project-name">{{ project.name }}</span>
+            <input type="text" id="edit-project-name" style="display: none;" value="{{ project.name }}">
+            <button onclick="toggleEditName()">Редактировать</button>
+            <button id="save-button" style="display: none;" onclick="saveName()">Сохранить</button>
+        </h1>
+        
+        <a href="{{ url_for('select_goods', project_id=project.id) }}" class="btn btn-primary">Добавить товар</a>
+        <a href="{{ url_for('add_reception', project_id=project.id) }}" class="btn btn-primary mb-3">Добавить новую приемку</a>
+        {% if dates %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Товар</th>
+                    <th>Цвет</th>
+                    <th>Размер</th>
+                    <th>Штрих-код</th>
+                    {% for date in dates %}
+                    <th>{{ date.strftime('%d.%m.%Y') }}</th>
+                    <th>Брак</th>
+                    {% endfor %}
+                    <th>Итого</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for good_id, good in goods.items() %}
+                <tr data-good-id="{{ good_id }}">
+                    <td>{{ good.name }}</td>
+                    <td>{{ good.color }}</td>
+                    <td>{{ good.size }}</td>
+                    <td>{{ good.barcode }}</td>
+                    {% set total_quantity = namespace(value=0) %}
+                    {% set total_defect = namespace(value=0) %}
+                    {% for date in dates %}
+
+                        {% set reception = good.receptions.get(date, {'quantity': 0, 'defect': 0}) %}
+                        <td class="editable" data-date="{{ date }}" data-field="quantity">
+                            <input type="number" class="quantity-input" data-goods-id="{{ good_id }}" 
+                            data-date="{{ date.strftime('%Y-%m-%d') }}" 
+                            value="{{ reception.quantity }}" min="0">
+                 </td>
+                 <td class="editable" data-date="{{ date }}" data-field="defect">
+                     <input type="number" class="defect-input" data-goods-id="{{ good_id }}" 
+                            data-date="{{ date.strftime('%Y-%m-%d') }}" 
+                            value="{{ reception.defect }}" min="0">
+                 </td>
+                 {% set total_quantity.value = total_quantity.value + reception.quantity %}
+                 {% set total_defect.value = total_defect.value + reception.defect %}
+             {% endfor %}
+             <td id="total-{{ good_id }}">{{ total_quantity.value - total_defect.value }}</td>
+             <td>
+                <button class="delete-good" data-good-id="{{ good_id }}">Удалить товар</button>
+            </td>
+         </tr>            
+      
+         {% endfor %}
+     </tbody>
+ </table>
+ {%endif%}
+ <!-- Добавьте под таблицей кнопки для удаления приходов -->
+{% for date in dates %}
+<button class="delete-reception" data-date="{{ date.strftime('%Y-%m-%d') }}">
+    Удалить приход от {{ date.strftime('%d.%m.%Y') }}
+</button>
+{% endfor %}
+</div>
+<!-- Замените существующий код для вывода действий на следующий -->
+<div class="mt-5">
+    <h3>Действия по приемкам</h3>
+    {% for date in dates %}
+    <div class="card mb-3">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">{{ date.strftime('%d.%m.%Y') }}</h5>
+                {% for reception in receptions %}
+                    {% if reception.priemka_date == date %}
+                    <a href="{{ url_for('add_reception_action', project_id=project.id, reception_id=reception.id) }}" 
+                       class="btn btn-primary btn-sm">
+                        Добавить действие
+                    </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="card-body">
+            {% for reception in receptions %}
+                {% if reception.priemka_date == date %}
+                <div class="mb-4">
+                    <h6>Приемка {{ reception.priemka_number }}</h6>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Действие</th>
+                                <th>Прогресс</th>
+                                <th>Статус</th>
+                                <th>Сотрудники в работе</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for action in reception.actions %}
+                            <tr>
+                                <td>
+                                    {{ action.name }}
+                                    <button class="btn btn-danger btn-sm delete-action" 
+                                            data-action-id="{{ action.id }}"
+                                            data-project-id="{{ project.id }}">
+                                        <i class="fas fa-trash"></i> Удалить
+                                    </button>
+                                </td>
+                                <td>{{ action.name }}</td>
+                                <td style="width: 200px;">
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar {% if action.progress_percentage >= 100 %}bg-success{% else %}bg-primary{% endif %}" 
+                                             role="progressbar" 
+                                             style="width: {{ action.progress_percentage }}%"
+                                             aria-valuenow="{{ action.progress_percentage }}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                            {{ "%.1f"|format(action.progress_percentage) }}%
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">
+                                        Обработано: {{ action.total_processed }} из {{ action.quantity }}
+                                    </small>
+                                </td>
+                                <td>{{ action.status }}</td>
+                                <td>
+                                    {% if action.user_actions %}
+                                        <ul class="list-unstyled mb-0">
+                                            {% for user_action, user in action.user_action_data %}
+                                            <li>
+                                                {{ user.fio }} - 
+                                                {{ user_action.kol_vo }} шт.
+                                                ({{ user_action.status }})
+                                            </li>
+                                        {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        Нет сотрудников в работе
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center">Нет действий</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<style>
+.progress {
+    margin-bottom: 5px;
+}
+.table td {
+    vertical-align: middle;
+}
+.list-unstyled {
+    margin-bottom: 0;
+}
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+function toggleEditName() {
+ var nameSpan = document.getElementById('project-name');
+ var nameInput = document.getElementById('edit-project-name');
+ var saveButton = document.getElementById('save-button');
+
+ if (nameSpan.style.display !== 'none') {
+     nameSpan.style.display = 'none';
+     nameInput.style.display = 'inline';
+     saveButton.style.display = 'inline';
+     nameInput.focus();
+ } else {
+     nameSpan.style.display = 'inline';
+     nameInput.style.display = 'none';
+     saveButton.style.display = 'none';
+ }
+}
+
+function saveName() {
+ var newName = document.getElementById('edit-project-name').value;
+ fetch('/projects/{{ project.id }}/update_name', {
+     method: 'POST',
+     headers: {
+         'Content-Type': 'application/json',
+     },
+     body: JSON.stringify({name: newName})
+ })
+ .then(response => response.json())
+ .then(data => {
+     if (data.success) {
+         document.getElementById('project-name').textContent = newName;
+         toggleEditName();
+     } else {
+         alert('Ошибка при сохранении названия');
+     }
+ });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+ const inputs = document.querySelectorAll('.quantity-input, .defect-input');
+ inputs.forEach(input => {
+     input.addEventListener('change', function() {
+         updateQuantity(this);
+         updateTotal(this);
+     });
+ });
+});
+
+function updateQuantity(input) {
+ const goodsId = input.dataset.goodsId;
+ const date = input.dataset.date;
+ const value = input.value;
+ const field = input.classList.contains('quantity-input') ? 'quantity' : 'defect';
+
+ fetch('/update_project_detail', {
+     method: 'POST',
+     headers: {
+         'Content-Type': 'application/json'
+     },
+     body: JSON.stringify({
+         project_id: {{ project.id }},
+         good_id: goodsId,
+         date: date,
+         field: field,
+         value: value
+     })
+ })
+ .then(response => response.json())
+ .then(data => {
+     if (data.success) {
+         console.log('Data updated successfully');
+         input.style.backgroundColor = '#90EE90';  // Лёгкий зелёный цвет для индикации успеха
+         setTimeout(() => {
+             input.style.backgroundColor = '';  // Возвращаем исходный цвет через 1 секунду
+         }, 1000);
+     } else {
+         console.error('Failed to update data');
+         input.style.backgroundColor = '#FFB6C1';  // Лёгкий красный цвет для индикации ошибки
+                setTimeout(() => {
+                    input.style.backgroundColor = '';  // Возвращаем исходный цвет через 1 секунду
+                }, 1000);
+            }
+        });
+    }
+    function updateTotal(input) {
+    const row = input.closest('tr');
+    const goodId = row.dataset.goodId;
+    const quantityInputs = row.querySelectorAll('.quantity-input');
+    const defectInputs = row.querySelectorAll('.defect-input');
+    
+    let totalQuantity = 0;
+    let totalDefect = 0;
+
+    quantityInputs.forEach(qInput => {
+        totalQuantity += parseInt(qInput.value) || 0;
+    });
+
+    defectInputs.forEach(dInput => {
+        totalDefect += parseInt(dInput.value) || 0;
+    });
+
+    const total = totalQuantity - totalDefect;
+    const totalCell = document.getElementById(`total-${goodId}`);
+    if (totalCell) {
+        totalCell.textContent = total;
+    }
+}
+    </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    // Обработчик для кнопок удаления товара
+    document.querySelectorAll('.delete-good').forEach(button => {
+        button.addEventListener('click', function() {
+            const goodId = this.dataset.goodId;
+            const projectId = {{ project.id }};
+            const url = `/projects/${projectId}/delete_good/${goodId}`;
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Удалите строку таблицы с удаленным товаром
+                    const row = this.closest('tr');
+                    row.remove();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error(error));
+        });
+    });
+
+    // Обработчик для кнопок удаления приходов
+    // Обработчик для кнопок удаления приходов
+
+document.querySelectorAll('.delete-reception').forEach(button => {
+    button.addEventListener('click', function() {
+        if (confirm('Вы уверены, что хотите удалить этот приход?')) {
+            const button = this;
+            button.disabled = true;  // Деактивируем кнопку
+            button.textContent = 'Удаление...';  // Меняем текст
+
+            const date = this.dataset.date;
+            const projectId = {{ project.id }};
+            const url = `/projects/${projectId}/delete_reception/${date}`;
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    button.disabled = false;
+                    button.textContent = 'Удалить приход';  // Возвращаем исходный текст
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                button.disabled = false;
+                button.textContent = 'Удалить приход';
+                alert('Произошла ошибка при удалении прихода');
+            });
+        }
+    });
+});
+});
+
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Находим все кнопки удаления действий
+        document.querySelectorAll('.delete-action').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                if (!confirm('Вы уверены, что хотите удалить это действие?')) {
+                    return;
+                }
+    
+                const actionId = this.dataset.actionId;
+                const projectId = this.dataset.projectId;
+                const button = this;
+                
+                // Деактивируем кнопку на время удаления
+                button.disabled = true;
+                
+                fetch(`/projects/${projectId}/actions/${actionId}/delete`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Находим и удаляем строку таблицы
+                        const row = button.closest('tr');
+                        row.remove();
+                        
+                        // Показываем сообщение об успехе
+                        alert('Действие успешно удалено');
+                    } else {
+                        // В случае ошибки включаем кнопку обратно
+                        button.disabled = false;
+                        alert('Ошибка при удалении действия: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    button.disabled = false;
+                    alert('Произошла ошибка при удалении действия');
+                });
+            });
+        });
+    });
+    </script>
+    
+    <!-- Добавьте стили для кнопки -->
+    <style>
+    .delete-action {
+        margin-left: 10px;
+        padding: 2px 8px;
+        font-size: 0.8em; }
+    </style>
+</body>
+</html>
