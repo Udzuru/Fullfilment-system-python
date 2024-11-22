@@ -41,7 +41,7 @@ def admin_dashboard():
         return "Доступ запрещен", 403
     return render_template("admin_dashboard.html")
 
-
+#________________________________________________________ИП___________________________________________________________
 @app.route("/ips")
 @login_required
 def list_ips():
@@ -73,6 +73,27 @@ def delete_ip(ip_id):
         db.session.commit()
     return redirect(url_for("list_ips"))
 
+@app.route("/ips/edit/<int:ip_id>", methods=["GET", "POST"])
+@login_required
+def edit_ip(ip_id):
+    if current_user.role != "Администратор":
+        return "Доступ запрещен", 403
+    
+    ip = Ip.query.get(ip_id)
+    if not ip:
+        return "ИП-шник не найден", 404
+    
+    if request.method == "POST":
+        name = request.form.get("name")
+        
+        if name:
+            ip.name = name
+            db.session.commit()
+            return redirect(url_for("list_ips"))
+    
+    return render_template("edit_ip.html", ip=ip)
+
+#__________________________________________________________________ТОВАРЫ___________________________________________________
 @app.route("/goods", methods=["GET", "POST"])
 @login_required
 def list_goods():
@@ -171,6 +192,7 @@ def edit_employee(employee_id):
         flash("Сотрудник успешно отредактирован", "success")
         return redirect(url_for("list_employees"))
     return render_template("edit_employees.html", employee=employee)
+
 @app.route("/goods/edit/<int:goods_id>", methods=["GET", "POST"])
 @login_required
 def edit_goods(goods_id):
@@ -212,6 +234,12 @@ def edit_goods(goods_id):
     # Для GET запроса просто показываем форму
     return render_template("edit_goods.html", goods=goods, ips=ips)
 
+#______________________________________________________________________________________СООТРУДНИКИ_________________________________________
+@app.route("/employees/add", methods=["GET"])
+@login_required
+def add_employees_page():
+    return render_template("add_employees.html")
+
 @app.route("/employees/add", methods=["POST"])
 @login_required
 def add_employee():
@@ -251,15 +279,7 @@ def list_employees():
     employees = query.all()
 
     return render_template("employees.html", employees=employees, search=search, sort_by=sort_by, sort_order=sort_order)
-
-@app.route("/employees/add", methods=["GET"])
-@login_required
-def add_employees_page():
-    return render_template("add_employees.html")
-
-
-    
-    
+  
 
 @app.route("/employees/delete/<int:employee_id>")
 @login_required
@@ -275,25 +295,7 @@ def delete_employee(employee_id):
 
 
 
-@app.route("/ips/edit/<int:ip_id>", methods=["GET", "POST"])
-@login_required
-def edit_ip(ip_id):
-    if current_user.role != "Администратор":
-        return "Доступ запрещен", 403
-    
-    ip = Ip.query.get(ip_id)
-    if not ip:
-        return "ИП-шник не найден", 404
-    
-    if request.method == "POST":
-        name = request.form.get("name")
-        
-        if name:
-            ip.name = name
-            db.session.commit()
-            return redirect(url_for("list_ips"))
-    
-    return render_template("edit_ip.html", ip=ip)
+
 
 @app.route("/projects", methods=["GET", "POST"])
 @login_required
